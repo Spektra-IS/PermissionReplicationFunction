@@ -1,0 +1,197 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "functionAppName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the Function App (must be globally unique)"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for deployment"
+      }
+    },
+    "deployStorageAccount": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Set to true to deploy a new storage account, false to use an existing one"
+      }
+    },
+    "existingStorageAccountName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Name of an existing storage account (used if deployStorageAccount is false)"
+      }
+    },
+    "deployAppInsights": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Set to true to deploy a new Application Insights resource"
+      }
+    },
+    "existingAppInsightsInstrumentationKey": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Instrumentation Key of an existing Application Insights resource"
+      }
+    },
+    "packageUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Public or SAS URL of the zipped function package"
+      }
+    },
+    "appInfoJson": {
+      "type": "string",
+      "metadata": {
+        "description": "JSON array of apps, e.g. [{ \"DisplayName\": \"App1\", \"ClientId\": \"xxx\" }, { \"DisplayName\": \"App2\", \"ClientId\": \"yyy\" }]"
+      }
+    },
+    "spHostUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "SharePoint host URL"
+      }
+    },
+    "allowedUrlPaths": {
+      "type": "string",
+      "metadata": {
+        "description": "Comma-separated list of allowed SharePoint paths"
+      }
+    }
+  },
+  "variables": {
+    "storageAccountName": "[toLower(concat(uniqueString(resourceGroup().id), 'funcsa'))]",
+    "hostingPlanName": "[concat(parameters('functionAppName'), '-plan')]",
+    "appInsightsName": "[concat(parameters('functionAppName'), '-ai')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2024-11-01",
+      "name": "[variables('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {},
+      "condition": "[parameters('deployStorageAccount')]"
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('appInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web"
+      },
+      "condition": "[parameters('deployAppInsights')]"
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2024-11-01",
+      "name": "[variables('hostingPlanName')]",
+      "location": "[parameters('location')]",
+      "kind": "functionapp",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic"
+      },
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2024-11-01",
+      "name": "[parameters('functionAppName')]",
+      "location": "[parameters('location')]",
+      "kind": "functionapp",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "powershell"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[if(parameters('deployStorageAccount'), concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2023-01-01').keys[0].value, ';EndpointSuffix=core.windows.net'), concat('DefaultEndpointsProtocol=https;AccountName=', parameters('existingStorageAccountName'), ';EndpointSuffix=core.windows.net'))]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[if(parameters('deployStorageAccount'), concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2023-01-01').keys[0].value, ';EndpointSuffix=core.windows.net'), concat('DefaultEndpointsProtocol=https;AccountName=', parameters('existingStorageAccountName'), ';EndpointSuffix=core.windows.net'))]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[toLower(parameters('functionAppName'))]"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[if(parameters('deployAppInsights'), reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').InstrumentationKey, parameters('existingAppInsightsInstrumentationKey'))]"
+            },
+            {
+              "name": "AppInfoJson",
+              "value": "[parameters('appInfoJson')]"
+            },
+            {
+              "name": "SpHostUrl",
+              "value": "[parameters('spHostUrl')]"
+            },
+            {
+              "name": "AllowedUrlPaths",
+              "value": "[parameters('allowedUrlPaths')]"
+            }
+          ]
+        },
+        "httpsOnly": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/extensions",
+      "apiVersion": "2024-11-01",
+      "name": "[format('{0}/{1}', parameters('functionAppName'), 'zipdeploy')]",
+      "properties": {
+        "packageUri": "[parameters('packageUri')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "functionAppName": {
+      "type": "string",
+      "value": "[parameters('functionAppName')]"
+    },
+    "functionAppUrl": {
+      "type": "string",
+      "value": "[concat('https://', parameters('functionAppName'), '.azurewebsites.net')]"
+    }
+  }
+}
