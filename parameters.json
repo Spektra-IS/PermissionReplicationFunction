@@ -5,9 +5,6 @@
     "functionAppName": {
       "value": "client-function-app"
     },
-    "location": {
-      "value": "[resourceGroup().location]"
-    },
     "deployStorageAccount": {
       "value": true
     },
