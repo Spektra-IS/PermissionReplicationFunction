@@ -12,7 +12,7 @@ languages:
 
 This sample Azure Resource Manager template deploys an Azure Function App on Windows Consumption plan and required resource including ZipDeploy extension to mount zip package for deployment.
 
-[![Deploy to Azure](/images/deploytoazure.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSpektra-IS%2FPermissionReplicationFunction%2Frefs%2Fheads%2Fmain%2Ftemplate.json?parametersuri=https%3A%2F%2Fraw.githubusercontent.com%2FSpektra-IS%2FPermissionReplicationFunction%2Frefs%2Fheads%2Fmain%2Fparameters.json)
+[![Deploy to Azure](/images/deploytoazure.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSpektra-IS%2FPermissionReplicationFunction%2Fmain%2Ftemplate.json?parametersuri=https%3A%2F%2Fraw.githubusercontent.com%2FSpektra-IS%2FPermissionReplicationFunction%2Fmain%2Fparameters.json)
 
 ### OS
 
