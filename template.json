@@ -52,7 +52,7 @@
     "appInfoJson": {
       "type": "array",
       "metadata": {
-        "description": "JSON array of apps, e.g. [{ \"DisplayName\": \"App1\", \"ClientId\": \"xxx\" }, { \"DisplayName\": \"App2\", \"ClientId\": \"yyy\" }]"
+        "description": "List of apps"
       }
     },
     "spHostUrl": {
@@ -157,7 +157,7 @@
             },
             {
               "name": "AppInfoJson",
-              "value": "[parameters('appInfoJson')]"
+              "value": "[string(parameters('appInfoJson'))]"
             },
             {
               "name": "SpHostUrl",
