@@ -43,7 +43,7 @@
         "description": "Instrumentation Key of an existing Application Insights resource"
       }
     },
-    "packageUrl": {
+    "packageUri": {
       "type": "string",
       "metadata": {
         "description": "Public or SAS URL of the zipped function package"
