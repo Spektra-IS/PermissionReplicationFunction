@@ -2,15 +2,31 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "functionAppName": { "value": "client-function-app" },
-    "location": { "value": "northeurope" },
-    "deployStorageAccount": { "value": true },
-    "existingStorageAccountName": { "value": "" },
-    "deployAppInsights": { "value": true },
-    "existingAppInsightsInstrumentationKey": { "value": "" },
-    "packageUri": { "value": "https://<storageaccount>.blob.core.windows.net/functionzips/myfunc.zip" },
-    "appInfoJson": { "value": "[{ \"DisplayName\": \"App1\", \"ClientId\": \"11111111-1111-1111-1111-111111111111\" }, { \"DisplayName\": \"App2\", \"ClientId\": \"22222222-2222-2222-2222-222222222222\" }]" },
-    "spHostUrl": { "value": "https://yourtenant.sharepoint.com" },
-    "allowedUrlPaths": { "value": "/sites/app1,/sites/app2" }
+    "deployStorageAccount": {
+      "value": true
+    },
+    "existingStorageAccountName": {
+      "value": null
+    },
+    "deployAppInsights": {
+      "value": true
+    },
+    "existingAppInsightsInstrumentationKey": {
+      "value": null
+    },
+    "appInfoJson": {
+      "value": [
+        {
+          "DisplayName": "Spektra eSignatures - Limited",
+          "ClientId": "54e9c29b-426b-426e-8191-d7af445ab83f"
+        }
+      ]
+    },
+    "spHostUrl": {
+      "value": "https://yourtenant.sharepoint.com"
+    },
+    "allowedUrlPaths": {
+      "value": "/sites/app1,/sites/app2"
+    }
   }
 }
