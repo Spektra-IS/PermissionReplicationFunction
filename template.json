@@ -50,7 +50,7 @@
       }
     },
     "appInfoJson": {
-      "type": "string",
+      "type": "array",
       "metadata": {
         "description": "JSON array of apps, e.g. [{ \"DisplayName\": \"App1\", \"ClientId\": \"xxx\" }, { \"DisplayName\": \"App2\", \"ClientId\": \"yyy\" }]"
       }
