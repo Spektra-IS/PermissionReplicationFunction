@@ -31,7 +31,7 @@ Dæmi:
 5. Smella svo á Save
 6. Velja svo rétt subscription og Resource group (Búa til nýja Resource Group ef þarf) og region.
 7. Gefa nafn á function appið
-8. :exclamation: ==Ekki breyta Location== það á að vera `[resourceGroup().location]`
+8. :exclamation: Ekki breyta Location það á að vera `[resourceGroup().location]`
 9. `Deploy Storage Account`
     * Ef það er `true` þá mun Azure stofna nýjan storage account.
     * Ef það er `false` þá þarf að skilgreina nafnið á storage account sem function appið á að nota í `Existing Storage Account Name`.
